@@ -1,0 +1,80 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Nadi\Symfony\Nadi:
+        arguments:
+            $config: '%nadi%'
+
+    Nadi\Symfony\Transporter:
+        arguments:
+            $config: '%nadi%'
+
+    Nadi\Symfony\Handler\Base:
+        abstract: true
+
+    Nadi\Symfony\Handler\HandleExceptionEvent:
+        arguments:
+            $nadi: '@Nadi\Symfony\Nadi'
+
+    Nadi\Symfony\Handler\HandleHttpRequestEvent:
+        arguments:
+            $nadi: '@Nadi\Symfony\Nadi'
+            $config: '%nadi%'
+
+    Nadi\Symfony\Handler\HandleQueryEvent:
+        arguments:
+            $nadi: '@Nadi\Symfony\Nadi'
+
+    Nadi\Symfony\Handler\HandleCommandEvent:
+        arguments:
+            $nadi: '@Nadi\Symfony\Nadi'
+
+    Nadi\Symfony\EventSubscriber\NadiEventSubscriber:
+        arguments:
+            $exceptionHandler: '@Nadi\Symfony\Handler\HandleExceptionEvent'
+            $httpRequestHandler: '@Nadi\Symfony\Handler\HandleHttpRequestEvent'
+            $commandHandler: '@Nadi\Symfony\Handler\HandleCommandEvent'
+            $enabled: '%nadi.enabled%'
+        tags:
+            - { name: kernel.event_subscriber }
+
+    Nadi\Symfony\Middleware\OpenTelemetryMiddleware:
+        arguments:
+            $nadi: '@Nadi\Symfony\Nadi'
+            $enabled: '%nadi.enabled%'
+        tags:
+            - { name: kernel.event_subscriber }
+
+    Nadi\Symfony\Doctrine\NadiSQLLogger:
+        arguments:
+            $nadi: '@Nadi\Symfony\Nadi'
+            $slowThreshold: '%nadi.query.slow_threshold%'
+        tags:
+            - { name: doctrine.middleware }
+
+    Nadi\Symfony\Command\InstallCommand:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+        tags:
+            - { name: console.command }
+
+    Nadi\Symfony\Command\TestCommand:
+        arguments:
+            $nadi: '@Nadi\Symfony\Nadi'
+        tags:
+            - { name: console.command }
+
+    Nadi\Symfony\Command\VerifyCommand:
+        arguments:
+            $nadi: '@Nadi\Symfony\Nadi'
+            $nadiConfig: '%nadi%'
+        tags:
+            - { name: console.command }
+
+    Nadi\Symfony\Command\UpdateShipperCommand:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+        tags:
+            - { name: console.command }
