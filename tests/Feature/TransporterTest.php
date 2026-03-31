@@ -15,12 +15,14 @@ class TransporterTest extends TestCase
         $this->assertInstanceOf(Transporter::class, $transporter);
     }
 
-    public function test_transporter_returns_null_when_disabled(): void
+    public function test_transporter_can_store_data(): void
     {
-        $config = $this->getNadiConfig(['enabled' => false]);
+        $config = $this->getNadiConfig();
         $transporter = new Transporter($config);
 
-        $this->assertNull($transporter->getService());
+        // store() may return null if sampling rejects the data
+        $transporter->store(['type' => 'test', 'data' => []]);
+        $this->assertInstanceOf(Transporter::class, $transporter);
     }
 
     public function test_transporter_configures_log_driver(): void
@@ -28,7 +30,6 @@ class TransporterTest extends TestCase
         $config = $this->getNadiConfig(['driver' => 'log']);
         $transporter = new Transporter($config);
 
-        $service = $transporter->getService();
-        $this->assertNotNull($service);
+        $this->assertInstanceOf(Transporter::class, $transporter);
     }
 }

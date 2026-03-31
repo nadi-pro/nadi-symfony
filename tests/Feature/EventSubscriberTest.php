@@ -25,12 +25,7 @@ class EventSubscriberTest extends TestCase
         $config = $this->getNadiConfig();
         $nadi = new Nadi($config);
 
-        $subscriber = new NadiEventSubscriber(
-            exceptionHandler: new HandleExceptionEvent($nadi),
-            httpRequestHandler: new HandleHttpRequestEvent($nadi, $config),
-            commandHandler: new HandleCommandEvent($nadi),
-            enabled: true,
-        );
+        $subscriber = new NadiEventSubscriber($nadi, $config);
 
         $this->assertInstanceOf(NadiEventSubscriber::class, $subscriber);
     }
